@@ -15,8 +15,8 @@ public class OldBossEnemyPlane {
 	private boolean alive;
 	private int liveValue;// 生命值
 	private GameStart gs = null;
+	private boolean flag = false;
 
-	
 	public static Image getEnemyPlaneImg() {
 		return enemyPlaneImg;
 	}
@@ -87,13 +87,30 @@ public class OldBossEnemyPlane {
 
 	Random random = new Random();
 
-	public void drawEnemyPlane(Graphics g)// 画OldBoss飞机
+	public void drawOldBossPlane(Graphics g)// 画OldBoss飞机
 	{
-		g.drawImage(enemyPlaneImg, x, y, width, height, gs);
-		if (random.nextInt(201) % 200 == 0) {
-			EnemyBullet eb = new EnemyBullet(x, y, 10, 10, alive, gs);
-			gs.enemyBulletList.add(eb);// 将敌军子弹加入数组列表
+		// 方向控制
+		if (x == 0) {
+			flag = true;
 		}
+		if (x >= 400 - width) {
+			flag = false;
+		}
+
+		if (flag == true) {
+			x++;
+		} else {
+			x--;
+		}
+
+		int pointx = x % (410 - width);
+		g.drawImage(enemyPlaneImg, pointx, y, width, height, gs);
+		if (random.nextInt(201) % 40 == 0) {
+			OldBossBullet eb = new OldBossBullet(pointx + 50, y + 120, 10, 10,
+					alive, gs);
+			gs.oldBossmbList.add(eb);// 将敌军子弹加入数组列表
+		}
+
 	}
 
 	public Rectangle getRec() {

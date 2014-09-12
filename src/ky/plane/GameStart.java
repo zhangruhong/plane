@@ -22,17 +22,19 @@ public class GameStart extends Frame {
 	public final int height = 500;
 
 	public BackGround bg = new BackGround(0, 0, 400, 500, this);// 背景图
-	public MyPlane mp = new MyPlane(160, 400, 50, 50, true, this);// 我军飞机对象
-	public MyPlane2 mp2 = new MyPlane2(350, 400, 50, 50, true, this);// 我军飞机对象
-	public ArrayList<MyBullet> mbList = new ArrayList<MyBullet>();// 子弹集合
-	public ArrayList<EnemyPlane> enemyList = new ArrayList<EnemyPlane>();// 敌军集合
-	public ArrayList<EnemyBullet> enemyBulletList = new ArrayList<EnemyBullet>();// 敌军集合
+	public MyPlane mp = new MyPlane(160, 400, 50, 50, true, this);// 我军飞机对象1
+	public MyPlane2 mp2 = new MyPlane2(350, 400, 50, 50, true, this);// 我军飞机对象2
+	public ArrayList<EnemyPlane> enemyList = new ArrayList<EnemyPlane>();// 敌军集合1
+	public ArrayList<EnemyBullet> enemyBulletList = new ArrayList<EnemyBullet>();// 敌军子弹集合2
+	public ArrayList<MyBullet> mbList = new ArrayList<MyBullet>();// 玩家1子弹集合
 	public ArrayList<MyBullet> mb2List = new ArrayList<MyBullet>();// 玩家2子弹集合
-	// OldBossEnemyPlane obep=new OldBossEnemyPlane(, y, width, height, alive,
-	// liveValue, gs);
+	public ArrayList<OldBossBullet> oldBossmbList = new ArrayList<OldBossBullet>();// oldBoss子弹集合
+	public OldBossEnemyPlane obep = new OldBossEnemyPlane(150, 45, width - 250,
+			height - 350, true, 100, this);
+
 	private GameSound bgmusic = new GameSound();
 	private Bomb bomb = null;
-	private int totalScore = 0;
+	private int totalScore = 4990;
 
 	public Bomb getBomb() {
 		return bomb;
@@ -157,28 +159,7 @@ public class GameStart extends Frame {
 				mbList.remove(mb);
 			}
 		}
-
-		// 敌机
-		for (int i = 0; i < enemyList.size(); i++) {
-			EnemyPlane ep = enemyList.get(i);
-			ep.drawEnemyPlane(g);// 将数组集合里的子敌军对象依次画出来
-			if (ep.getY() > 650)
-				ep.setLive(false);
-			if (!ep.isLive()) {
-				enemyList.remove(ep);
-			}
-		}
-		// 敌人子弹1
-		for (int i = 0; i < enemyBulletList.size(); i++) {
-			EnemyBullet eb = enemyBulletList.get(i);
-			eb.drawEnemyBullet(g);// 将数组集合里的敌军子弹对象依次画出来
-			if (eb.getY() > 650)
-				eb.setLive(false);
-			if (!eb.isLive()) {
-				enemyBulletList.remove(eb);
-			}
-		}
-		// 敌人子弹2
+		// 自己的子弹2
 		for (int i = 0; i < mb2List.size(); i++) {
 			MyBullet mb = mb2List.get(i);
 			mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
@@ -188,14 +169,43 @@ public class GameStart extends Frame {
 			if (!mb.isLive()) {
 				mb2List.remove(mb);
 			}
-
 		}
 
-		int scoce = 500;// 预设分数
 		// 分数在这个范围出现老王1以及他的子弹等。。。
-		if (scoce > 5000 && scoce < 10000) {
+		if (totalScore > 5000 && totalScore < 10000) {
+			obep.drawOldBossPlane(g);
+			// 老波斯子弹
+			for (int i = 0; i < oldBossmbList.size(); i++) {
+				OldBossBullet obb = oldBossmbList.get(i);
+				obb.drawOldBossBullet(g);// 将数组集合里的敌军子弹对象依次画出来
+				if (obb.getY() > 600)
+					obb.setLive(false);
+				if (!obb.isLive()) {
+					enemyBulletList.remove(obb);
+				}
+			}
+		} else {
+			// 敌机
+			for (int i = 0; i < enemyList.size(); i++) {
+				EnemyPlane ep = enemyList.get(i);
+				ep.drawEnemyPlane(g);// 将数组集合里的子敌军对象依次画出来
+				if (ep.getY() > 650)
+					ep.setLive(false);
+				if (!ep.isLive()) {
+					enemyList.remove(ep);
+				}
+			}
+			// 敌人子弹1
+			for (int i = 0; i < enemyBulletList.size(); i++) {
+				EnemyBullet eb = enemyBulletList.get(i);
+				eb.drawEnemyBullet(g);// 将数组集合里的敌军子弹对象依次画出来
+				if (eb.getY() > 650)
+					eb.setLive(false);
+				if (!eb.isLive()) {
+					enemyBulletList.remove(eb);
+				}
+			}
 		}
-
 		// 爆炸
 		if (bomb != null) {
 			bomb.drawBomb(g);// 画爆炸

@@ -69,18 +69,14 @@ public class MyPlane {
 			break;
 		case KeyEvent.VK_J:
 			Fire = true;
-			// MyBullet bullet = new MyBullet(x + 15, y, 20, 20, true, gs);
-			// gs.mbList.add(bullet);
-			// GameStart.beammusic.playSound("music/Beam.mp3");
 
 			break;
 		default:
 			break;
 		}
-	}
-
+	}  
+ 
 	public void keyReleased(KeyEvent e) {// 按键松开事件
-		// TODO Auto-generated method stub
 		int code = e.getKeyCode();
 		switch (code) {
 		case KeyEvent.VK_W:
