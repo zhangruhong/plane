@@ -27,9 +27,9 @@ public class Bomb {
 	}
 
 	public void drawBomb(Graphics g) {// »­±¬Õ¨
-
 		g.drawImage(bombImg, x, y, 30, 30, gs);
 		g.drawImage(bombImg2, x, y, 30, 30, gs);
+		gs.beammusic.playSound("music/boom.mp3");
 	}
 
 }

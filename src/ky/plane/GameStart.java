@@ -179,7 +179,6 @@ public class GameStart extends Frame {
 
 	@Override
 	public void paint(Graphics g) {
-		System.out.println(count);
 		bg.drawBG(g);// 画背景
 		if (mp != null && mp.isAlive()) {
 			mp.drawMyPlane(g);// 画自己飞机1
@@ -191,9 +190,7 @@ public class GameStart extends Frame {
 		if (stop == true && !mp.isAlive() && !mp2.isAlive()
 				&& mp.getBlood() < 1 && mp2.getBlood() < 1) {
 			stop = false;
-			mp = null;
-			mp2 = null;
-			int option = JOptionPane.showConfirmDialog(this, "再来一次？", "挑战成功",
+			int option = JOptionPane.showConfirmDialog(this, "再来一次？", "挑战失败",
 					JOptionPane.YES_NO_OPTION);
 			if (option == 0) {
 				// 重新开始
@@ -206,6 +203,7 @@ public class GameStart extends Frame {
 				return;
 			}
 		}
+
 		if (count / 500 >= 1 && ((count / 500) % 2 == 1)) {// 定时画食物
 			p.drawPower(g);
 		}
@@ -230,8 +228,12 @@ public class GameStart extends Frame {
 					mbList.remove(mb);
 				}
 			}
-			mp.EBoosHitMyPlane(obep);
-			mp2.EBoosHitMyPlane(obep);
+			if (mp != null && mp.isAlive()) {
+				mp.EBoosHitMyPlane(obep);
+			}
+			if (mp2 != null && mp2.isAlive()) {
+				mp2.EBoosHitMyPlane(obep);
+			}
 			// 自己的子弹2
 			for (int i = 0; i < mb2List.size(); i++) {
 
@@ -252,7 +254,9 @@ public class GameStart extends Frame {
 			// 老波斯子弹
 			for (int i = 0; i < oldBossmbList.size(); i++) {
 				OldBossBullet obb = oldBossmbList.get(i);
-				mp.bulletHitMyplane(obb);
+				if (mp != null && mp.isAlive()) {
+					mp.bulletHitMyplane(obb);
+				}
 				obb.drawEBullet(g);
 				// 将数组集合里的敌军子弹对象依次画出来
 				if (obb.getY() > 600)
@@ -296,10 +300,12 @@ public class GameStart extends Frame {
 			for (int i = 0; i < enemyList.size(); i++) {
 				EnemyPlane ep = enemyList.get(i);
 				ep.drawEPlane(g);// 将数组集合里的子敌军对象依次画出来
-				mp.EPlanehitMyplane(ep);
-				;
-				mp2.EPlanehitMyplane(ep);
-				;
+				if (mp != null && mp.isAlive()) {
+					mp.EPlanehitMyplane(ep);
+				}
+				if (mp2 != null && mp2.isAlive()) {
+					mp2.EPlanehitMyplane(ep);
+				}
 				if (ep.getY() > 650)
 					ep.setAlive(false);
 				if (!ep.isAlive()) {
@@ -309,8 +315,12 @@ public class GameStart extends Frame {
 			// 敌人子弹1
 			for (int i = 0; i < enemyBulletList.size(); i++) {
 				EnemyBullet eb = enemyBulletList.get(i);
-				mp.bulletHitMyplane(eb);
-				mp2.bulletHitMyplane(eb);
+				if (mp != null && mp.isAlive()) {
+					mp.bulletHitMyplane(eb);
+				}
+				if (mp2 != null && mp2.isAlive()) {
+					mp2.bulletHitMyplane(eb);
+				}
 				eb.drawEBullet(g);// 将数组集合里的敌军子弹对象依次画出来
 				if (eb.getY() > 650)
 					eb.setLive(false);
@@ -345,30 +355,30 @@ public class GameStart extends Frame {
 		}
 
 		count++;// 相当于定时器
+		if (count > 100000) {
+			count = 0;
+		}
 		g.setColor(Color.RED);
 		this.show(g, 10, 40, mp.blood, myScore);
 		g.setColor(Color.GREEN);
 		show(g, 250, 40, mp2.blood, hisScore);
-		int pointx = 10, pointy = 30;
-		g.setColor(Color.WHITE);
-		g.drawString("总分", pointx + 170, pointy + 10);
-		g.drawString(String.valueOf(totalScore), pointx + 190, pointy + 30);
 		/**
 		 * 显示生命值、得分
 		 */
 
 		/*
-		 * // 血块 得分 int pointx = 10, pointy = 30; g.setColor(Color.GREEN);
-		 * g.drawString("韬哥:", pointx, pointy + 20); g.drawRect(pointx + 30,
-		 * pointy + 10, 70, 10); g.fillRect(pointx + 30, pointy + 10, (int) (0.7
-		 * * mp.getBlood()), 10);
+		 * // 血块 得分 int pointx = 10, pointy = 30; int pointx = 10, pointy = 30;
+		 * g.setColor(Color.GREEN); g.drawString("韬哥:", pointx, pointy + 20);
+		 * g.drawRect(pointx + 30, pointy + 10, 70, 10); g.fillRect(pointx + 30,
+		 * pointy + 10, (int) (0.7 * mp.getBlood()), 10);
+		 * g.setColor(Color.WHITE); g.drawString("总分", pointx + 170, pointy +
+		 * 10); g.drawString(String.valueOf(totalScore), pointx + 190, pointy +
+		 * 30);
 		 * 
 		 * g.setColor(Color.RED); g.drawString("祥哥:", pointx + 290, pointy +
 		 * 20); g.drawRect(pointx + 320, pointy + 10, 70, 10); g.fillRect(pointx
 		 * + 320, pointy + 10, (int) (0.7 * mp.getBlood()), 10);
 		 */
-		
-
 	}
 
 	public void show(Graphics g1, int x1, int y1, int blood1, int score1) {
@@ -380,7 +390,6 @@ public class GameStart extends Frame {
 		g1.drawString("当前得分：" + String.valueOf(score1), x1 + 10, y1 + 40);
 	}
 
-	
 	/**
 	 * @param args
 	 */
