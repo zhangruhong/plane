@@ -1,17 +1,21 @@
 package ky.plane;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Random;
+
+import javax.swing.JOptionPane;
 
 public class GameStart extends Frame {
 
@@ -30,11 +34,13 @@ public class GameStart extends Frame {
 	public ArrayList<MyBullet> mb2List = new ArrayList<MyBullet>();// 玩家2子弹集合
 	public ArrayList<OldBossBullet> oldBossmbList = new ArrayList<OldBossBullet>();// oldBoss子弹集合
 	public OldBossEnemyPlane obep = new OldBossEnemyPlane(150, 45, width - 250,
-			height - 350, true, 100, this);
+			height - 350, true, 1000, this);
 
 	private GameSound bgmusic = new GameSound();
 	private Bomb bomb = null;
 	private int totalScore = 4990;
+	private boolean stop = true;
+	Image[] enemyPlaneImages = new Image[4];
 
 	public Bomb getBomb() {
 		return bomb;
@@ -50,6 +56,14 @@ public class GameStart extends Frame {
 
 	public void setTotalScore(int totalScore) {
 		this.totalScore = totalScore;
+	}
+
+	public OldBossEnemyPlane getObep() {
+		return obep;
+	}
+
+	public void setObep(OldBossEnemyPlane obep) {
+		this.obep = obep;
 	}
 
 	public GameStart() {
@@ -89,8 +103,6 @@ public class GameStart extends Frame {
 		new MyThread().start();// 背景线程启动
 	}
 
-	Image[] enemyPlaneImages = new Image[4];
-
 	public void initEnemyImg() {
 		for (int i = 0; i < enemyPlaneImages.length; i++) {
 			enemyPlaneImages[i] = tool.getImage(GameStart.class
@@ -109,7 +121,7 @@ public class GameStart extends Frame {
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			while (true) {
+			while (stop) {
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
@@ -148,31 +160,31 @@ public class GameStart extends Frame {
 		mp.drawMyPlane(g);// 画自己飞机1
 		mp2.drawMyPlane(g);// 画自己飞机2
 
-		// 自己的子弹
-		for (int i = 0; i < mbList.size(); i++) {
-			MyBullet mb = mbList.get(i);
-			mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
-			mb.HitPlane(enemyList);
-			if (mb.getY() < 0)
-				mb.setLive(false);
-			if (!mb.isLive()) {
-				mbList.remove(mb);
-			}
-		}
-		// 自己的子弹2
-		for (int i = 0; i < mb2List.size(); i++) {
-			MyBullet mb = mb2List.get(i);
-			mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
-			mb.HitPlane(enemyList);
-			if (mb.getY() < 0)
-				mb.setLive(false);
-			if (!mb.isLive()) {
-				mb2List.remove(mb);
-			}
-		}
-
 		// 分数在这个范围出现老王1以及他的子弹等。。。
 		if (totalScore > 5000 && totalScore < 10000) {
+			// oldboss模式
+			for (int i = 0; i < mbList.size(); i++) {
+				MyBullet mb = mbList.get(i);
+				mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
+				mb.HitOldBossPlane(obep);
+				if (mb.getY() < 0)
+					mb.setLive(false);
+				if (!mb.isLive()) {
+					mbList.remove(mb);
+				}
+			}
+			// 自己的子弹2
+			for (int i = 0; i < mb2List.size(); i++) {
+				MyBullet mb = mb2List.get(i);
+				mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
+				mb.HitOldBossPlane(obep);
+				if (mb.getY() < 0)
+					mb.setLive(false);
+				if (!mb.isLive()) {
+					mb2List.remove(mb);
+				}
+			}
+
 			obep.drawOldBossPlane(g);
 			// 老波斯子弹
 			for (int i = 0; i < oldBossmbList.size(); i++) {
@@ -184,7 +196,30 @@ public class GameStart extends Frame {
 					enemyBulletList.remove(obb);
 				}
 			}
-		} else {
+		} else if (totalScore <= 5000) {
+			// 普通模式
+			// 自己的子弹
+			for (int i = 0; i < mbList.size(); i++) {
+				MyBullet mb = mbList.get(i);
+				mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
+				mb.HitPlane(enemyList);
+				if (mb.getY() < 0)
+					mb.setLive(false);
+				if (!mb.isLive()) {
+					mbList.remove(mb);
+				}
+			}
+			// 自己的子弹2
+			for (int i = 0; i < mb2List.size(); i++) {
+				MyBullet mb = mb2List.get(i);
+				mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
+				mb.HitPlane(enemyList);
+				if (mb.getY() < 0)
+					mb.setLive(false);
+				if (!mb.isLive()) {
+					mb2List.remove(mb);
+				}
+			}
 			// 敌机
 			for (int i = 0; i < enemyList.size(); i++) {
 				EnemyPlane ep = enemyList.get(i);
@@ -206,12 +241,20 @@ public class GameStart extends Frame {
 				}
 			}
 		}
+		if (totalScore >= 10000) {
+			// JOptionPane.showMessageDialog(this, "挑战成功！"
+			// ,"KO",MessageType.INFO);
+			stop = false;
+			JOptionPane.showMessageDialog(null, "挑战成功！");
+			// JOptionPane.showConfirmDialog(null, "再来一次？", "挑战成功",);
+		}
 		// 爆炸
 		if (bomb != null) {
 			bomb.drawBomb(g);// 画爆炸
 		}
 		bomb = null;
 
+		// 血块 得分
 		int pointx = 10, pointy = 30;
 		g.setColor(Color.GREEN);
 		g.drawString("HP:", pointx, pointy + 20);

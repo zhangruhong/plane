@@ -77,17 +77,33 @@ public class MyBullet {
 		return new Rectangle(x, y, width, height);// 获取子弹矩形框
 	}
 
-	public void HitPlane(ArrayList<EnemyPlane> enemyList) {// 判断子弹和敌军相撞
+	public void HitPlane(ArrayList<EnemyPlane> enemyList) { // 判断子弹和敌军相撞
 		for (int i = 0; i < enemyList.size(); i++) {
-			EnemyPlane ep = enemyList.get(i);// 拿到每一架飞机
+			EnemyPlane ep = enemyList.get(i); // 拿到每一架飞机
 			if (this.live && ep.isLive()
 					&& this.getRec().intersects(ep.getRec())) {
 				this.live = false;
 				ep.setLive(false);
 				gs.setBomb(new Bomb(x, y, 30, 30, true, gs));
-				gs.setTotalScore(gs.getTotalScore()+10);
+				gs.setTotalScore(gs.getTotalScore() + 10);
 			}
 
+		}
+	}
+
+	public void HitOldBossPlane(OldBossEnemyPlane oldBossEnemyPlane) { // 判断子弹和oldBoss相撞
+		OldBossEnemyPlane obep = oldBossEnemyPlane; // 拿到oldBoss飞机
+		// 没有血了 设置状态为死亡
+		if (obep.getLiveValue() < 1) {
+			obep.setAlive(false);
+		}
+		// 还有血 扣血
+		if (this.live && obep.isAlive()
+				&& this.getRec().intersects(obep.getRec())) {
+			this.live = false;
+			// gs.setBomb(new Bomb(x, y, 30, 30, true, gs));
+			obep.setLiveValue(obep.getLiveValue() - 1);
+			gs.setTotalScore(gs.getTotalScore() + 10);
 		}
 	}
 }
