@@ -5,116 +5,48 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.Random;
 
-public class OldBossEnemyPlane {
-	public static Image enemyPlaneImg = GameStart.tool.getImage(GameStart.class
-			.getResource("/images/boss_2.png"));// 敌军飞机1图片
-	private int x;
-	private int y;
-	private int width;
-	private int height;
-	private boolean alive;
-	private int liveValue;// 生命值
-	private GameStart gs = null;
+public class OldBossEnemyPlane extends EPlane {
+
+	Random random = new Random();
 	private boolean flag = false;
-
-	public static Image getEnemyPlaneImg() {
-		return enemyPlaneImg;
-	}
-
-	public static void setEnemyPlaneImg(Image enemyPlaneImg) {
-		OldBossEnemyPlane.enemyPlaneImg = enemyPlaneImg;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setY(int y) {
-		this.y = y;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	public boolean isAlive() {
-		return alive;
-	}
-
-	public void setAlive(boolean alive) {
-		this.alive = alive;
-	}
-
-	public int getLiveValue() {
-		return liveValue;
-	}
-
-	public void setLiveValue(int liveValue) {
-		this.liveValue = liveValue;
-	}
 
 	public OldBossEnemyPlane(int x, int y, int width, int height,
 			boolean alive, int liveValue, GameStart gs) {
-		super();
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.alive = alive;
-		this.liveValue = liveValue;
-		this.gs = gs;
+		super(x, y, width, height, alive, liveValue, gs);
+		super.setEPlaneImg(GameStart.tool.getImage(GameStart.class
+				.getResource("/images/boss_2.png")));
 	}
 
-	Random random = new Random();
+	public Rectangle getRec() {
+		return new Rectangle(super.getX(), super.getY(), super.getWidth(),
+				super.getHeight());// 获取老BOSS飞机矩形框
+	}
 
-	public void drawOldBossPlane(Graphics g)// 画OldBoss飞机
-	{
+	@Override
+	public void drawEPlane(Graphics g) {
 		// 方向控制
-		if (x == 0) {
+		if (super.getX() == 0) {
 			flag = true;
 		}
-		if (x >= 400 - width) {
+		if (super.getX() >= 400 - super.getWidth()) {
 			flag = false;
 		}
 
 		if (flag == true) {
-			x++;
+			super.setX(super.getX() + 1);
 		} else {
-			x--;
+			super.setX(super.getX() - 1);
 		}
 
-		int pointx = x % (410 - width);
-		g.drawImage(enemyPlaneImg, pointx, y, width, height, gs);
+		int pointx = super.getX() % (410 - super.getWidth());
+		g.drawImage(super.getEPlaneImg(), pointx, super.getY(),
+				super.getWidth(), super.getHeight(), super.getGs());
 		if (random.nextInt(201) % 40 == 0) {
-			OldBossBullet eb = new OldBossBullet(pointx + 50, y + 120, 10, 10,
-					alive, gs);
-			gs.oldBossmbList.add(eb);// 将敌军子弹加入数组列表
+			OldBossBullet eb = new OldBossBullet(pointx + 50,
+					super.getY() + 120, 10, 10, true, super.getGs());
+			 super.getGs().oldBossmbList.add(eb);// 将敌军子弹加入数组列表
 		}
 
-	}
-
-	public Rectangle getRec() {
-		return new Rectangle(x, y, width, height);// 获取老BOSS飞机矩形框
 	}
 
 }

@@ -80,15 +80,27 @@ public class MyBullet {
 	public void HitPlane(ArrayList<EnemyPlane> enemyList) { // 判断子弹和敌军相撞
 		for (int i = 0; i < enemyList.size(); i++) {
 			EnemyPlane ep = enemyList.get(i); // 拿到每一架飞机
-			if (this.live && ep.isLive()
+			if (this.live && ep.isAlive()
 					&& this.getRec().intersects(ep.getRec())) {
 				this.live = false;
-				ep.setLive(false);
+				ep.setAlive(false);
 				gs.setBomb(new Bomb(x, y, 30, 30, true, gs));
 				gs.setTotalScore(gs.getTotalScore() + 10);
 			}
 
 		}
+	}
+
+	// /////////////////////变子弹///////////////////////
+	public void eatPower(Power p) {// 判断子弹和食物相撞
+		if (this.live && p.isLive && this.getRec().intersects(p.getRec())) {
+			gs.type = 2;
+			gs.count = 500;
+			this.live = false;
+			p.isLive = false;
+
+		}
+
 	}
 
 	public void HitOldBossPlane(OldBossEnemyPlane oldBossEnemyPlane) { // 判断子弹和oldBoss相撞

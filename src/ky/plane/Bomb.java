@@ -2,7 +2,6 @@ package ky.plane;
 
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.KeyEvent;
 
 public class Bomb {
 	static Image bombImg = GameStart.tool.getImage(GameStart.class
