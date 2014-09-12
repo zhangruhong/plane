@@ -8,6 +8,8 @@ import java.util.ArrayList;
 public class MyBullet {
 	static Image myBulletImg = GameStart.tool.getImage(GameStart.class
 			.getResource("/images/bb_02.png")); // 我军子弹图片1
+	static Image myBulletImg2 = GameStart.tool.getImage(GameStart.class
+			.getResource("/images/bb_01.png")); // 我军子弹图片1
 	private int x;
 	private int y;
 	private int width;
@@ -68,9 +70,14 @@ public class MyBullet {
 
 	public void drawMyBullet(Graphics g) {
 
-		g.drawImage(myBulletImg, x, y, width, height, gs);// 画我军子弹
+		if (gs.type == 1) {
+			g.drawImage(myBulletImg, x, y, width, height, gs);
+		} else if (gs.type == 2) {
+			g.drawImage(myBulletImg2, x - 15, y, width, height, gs);
+			g.drawImage(myBulletImg, x, y, width, height, gs);
+			g.drawImage(myBulletImg2, x + 15, y, width, height, gs);
+		}
 		y -= 10;
-
 	}
 
 	public Rectangle getRec() {

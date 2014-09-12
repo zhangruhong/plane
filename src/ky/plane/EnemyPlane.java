@@ -30,7 +30,7 @@ public class EnemyPlane extends EPlane {
 			time1 = 0;
 		}
 		time1++;
-		super.setY(super.getY() + 3);
+		super.setY(super.getY() + 1);
 
 	}
 

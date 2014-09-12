@@ -18,12 +18,17 @@ public class GameStart extends Frame {
 
 	private static final long serialVersionUID = 1L;
 	private static GameStart gamestart = null;
-	public static int type = 1;
+
 	public GameSound beammusic = new GameSound();
 	static Toolkit tool = Toolkit.getDefaultToolkit();// 拿到默认的工具包
 	public final int width = 400;
 	public final int height = 500;
 
+	// 我机和战友共用的显示分数和生命值的图片
+	public Image scoreShowIMG = tool.getImage(GameStart.class
+			.getResource("/images/score.png"));
+	public Image bloodShowIMG = tool.getImage(GameStart.class
+			.getResource("/images/blood.png"));
 	public Image MyBulletImg2 = tool.getImage(GameStart.class
 			.getResource("/images/bb_02.png")); // 我军子弹图片2
 	Image bloodImg = tool.getImage(GameStart.class
@@ -33,6 +38,7 @@ public class GameStart extends Frame {
 	public MyPlane mp = new MyPlane(160, 400, 50, 50, true, this);// 我军飞机对象1
 	public MyPlane2 mp2 = new MyPlane2(350, 400, 50, 50, true, this);// 我军飞机对象2
 	public ArrayList<EnemyPlane> enemyList = new ArrayList<EnemyPlane>();// 敌军集合1
+																			// bul01.png
 	public ArrayList<EnemyBullet> enemyBulletList = new ArrayList<EnemyBullet>();// 敌军子弹集合2
 	public ArrayList<MyBullet> mbList = new ArrayList<MyBullet>();// 玩家1子弹集合
 	public ArrayList<MyBullet> mb2List = new ArrayList<MyBullet>();// 玩家2子弹集合
@@ -42,10 +48,11 @@ public class GameStart extends Frame {
 	public Power p = new Power(200, 260, 40, 40, true, this);// 能量
 	private GameSound bgmusic = new GameSound();
 	private Bomb bomb = null;
-	private int totalScore = 4990;
+	private int totalScore = 0;
 	private boolean stop = true;
 	Image[] enemyPlaneImages = new Image[4];
-	int count = 1;// 计数，用于控制POWER出现和爆炸事件
+	int myScore = 0;
+	int hisScore = 0;
 
 	public Bomb getBomb() {
 		return bomb;
@@ -143,10 +150,11 @@ public class GameStart extends Frame {
 				repaint();
 				int index = r.nextInt(enemyPlaneImages.length);
 				// 调用paint(Graphics g)
-				if (time % 40 == 0) {
+				if (time % 50 == 0) {
 					EnemyPlane ep = new EnemyPlane(r.nextInt(350), 0, 50, 50,
 							true, enemyPlaneImages[index], 10, GameStart.this);// 敌军飞机随记在上方出现
 					enemyList.add(ep);
+					time = 0;
 				}
 				time++;
 			}
@@ -154,6 +162,8 @@ public class GameStart extends Frame {
 	}
 
 	Image tempImg = null;
+	int type = 1;
+	int count = 1;// 计数，用于控制POWER出现和爆炸事件
 
 	@Override
 	// 二级缓冲技术
@@ -169,6 +179,7 @@ public class GameStart extends Frame {
 
 	@Override
 	public void paint(Graphics g) {
+		System.out.println(count);
 		bg.drawBG(g);// 画背景
 		if (mp != null && mp.isAlive()) {
 			mp.drawMyPlane(g);// 画自己飞机1
@@ -195,13 +206,22 @@ public class GameStart extends Frame {
 				return;
 			}
 		}
-
+		if (count / 500 >= 1 && ((count / 500) % 2 == 1)) {// 定时画食物
+			p.drawPower(g);
+		}
+		if ((count / 500) % 2 == 0) {
+			p.isLive = true;
+			type = 1;// 修改子弹类型
+		}// 定时画食物结束
 
 		// 分数在这个范围出现老王1以及他的子弹等。。。
-		if (totalScore > 5000 && totalScore < 10000) {
+		if (totalScore > 500 && totalScore < 1000) {
 			// oldboss模式
 			for (int i = 0; i < mbList.size(); i++) {
 				MyBullet mb = mbList.get(i);
+				if ((count / 500) % 2 == 1) {// 判断子弹是否命中食物，命中修改子弹类型
+					mb.eatPower(p);
+				}
 				mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
 				mb.HitOldBossPlane(obep);
 				if (mb.getY() < 0)
@@ -214,7 +234,11 @@ public class GameStart extends Frame {
 			mp2.EBoosHitMyPlane(obep);
 			// 自己的子弹2
 			for (int i = 0; i < mb2List.size(); i++) {
+
 				MyBullet mb = mb2List.get(i);
+				if ((count / 500) % 2 == 1) {// 判断子弹是否命中食物，命中修改子弹类型
+					mb.eatPower(p);
+				}
 				mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
 				mb.HitOldBossPlane(obep);
 				if (mb.getY() < 0)
@@ -237,9 +261,10 @@ public class GameStart extends Frame {
 					enemyBulletList.remove(obb);
 				}
 			}
-		} else if (totalScore <= 5000) {
+		} else if (totalScore <= 500) {
 			// 普通模式
 			// 自己的子弹
+
 			for (int i = 0; i < mbList.size(); i++) {
 				MyBullet mb = mbList.get(i);
 				if ((count / 500) % 2 == 1) {// 判断子弹是否命中食物，命中修改子弹类型
@@ -256,6 +281,9 @@ public class GameStart extends Frame {
 			// 自己的子弹2
 			for (int i = 0; i < mb2List.size(); i++) {
 				MyBullet mb = mb2List.get(i);
+				if ((count / 500) % 2 == 1) {// 判断子弹是否命中食物，命中修改子弹类型
+					mb.eatPower(p);
+				}
 				mb.drawMyBullet(g);// 将数组集合里的子弹对象依次画出来
 				mb.HitPlane(enemyList);
 				if (mb.getY() < 0)
@@ -268,8 +296,10 @@ public class GameStart extends Frame {
 			for (int i = 0; i < enemyList.size(); i++) {
 				EnemyPlane ep = enemyList.get(i);
 				ep.drawEPlane(g);// 将数组集合里的子敌军对象依次画出来
-				mp.EPlanehitMyplane(ep);;
-				mp2.EPlanehitMyplane(ep);;
+				mp.EPlanehitMyplane(ep);
+				;
+				mp2.EPlanehitMyplane(ep);
+				;
 				if (ep.getY() > 650)
 					ep.setAlive(false);
 				if (!ep.isAlive()) {
@@ -289,7 +319,7 @@ public class GameStart extends Frame {
 				}
 			}
 		}
-		if (stop == true && totalScore == 10000) {
+		if (stop == true && totalScore == 1000) {
 			// JOptionPane.showMessageDialog(this, "挑战成功！"
 			// ,"KO",MessageType.INFO);
 			stop = false;
@@ -309,29 +339,48 @@ public class GameStart extends Frame {
 		}
 		// 爆炸
 		if (bomb != null) {
-			bomb.drawBomb(g);// 画爆炸
+			bomb.drawBomb(g);// 画爆炸以及爆炸延时
+			if (count % 30 == 0)
+				bomb = null;
 		}
-		bomb = null;
 
 		count++;// 相当于定时器
-
-		// 血块 得分
-		int pointx = 10, pointy = 30;
-		g.setColor(Color.GREEN);
-		g.drawString("韬哥:", pointx, pointy + 20);
-		g.drawRect(pointx + 30, pointy + 10, 70, 10);
-		g.fillRect(pointx + 30, pointy + 10, (int) (0.7 * mp.getBlood()), 10);
-
 		g.setColor(Color.RED);
-		g.drawString("祥哥:", pointx + 290, pointy + 20);
-		g.drawRect(pointx + 320, pointy + 10, 70, 10);
-		g.fillRect(pointx + 320, pointy + 10, (int) (0.7 * mp.getBlood()), 10);
-
+		this.show(g, 10, 40, mp.blood, myScore);
+		g.setColor(Color.GREEN);
+		show(g, 250, 40, mp2.blood, hisScore);
+		int pointx = 10, pointy = 30;
 		g.setColor(Color.WHITE);
-		g.drawString("当前得分", pointx + 170, pointy + 10);
+		g.drawString("总分", pointx + 170, pointy + 10);
 		g.drawString(String.valueOf(totalScore), pointx + 190, pointy + 30);
+		/**
+		 * 显示生命值、得分
+		 */
+
+		/*
+		 * // 血块 得分 int pointx = 10, pointy = 30; g.setColor(Color.GREEN);
+		 * g.drawString("韬哥:", pointx, pointy + 20); g.drawRect(pointx + 30,
+		 * pointy + 10, 70, 10); g.fillRect(pointx + 30, pointy + 10, (int) (0.7
+		 * * mp.getBlood()), 10);
+		 * 
+		 * g.setColor(Color.RED); g.drawString("祥哥:", pointx + 290, pointy +
+		 * 20); g.drawRect(pointx + 320, pointy + 10, 70, 10); g.fillRect(pointx
+		 * + 320, pointy + 10, (int) (0.7 * mp.getBlood()), 10);
+		 */
+		
+
 	}
 
+	public void show(Graphics g1, int x1, int y1, int blood1, int score1) {
+		g1.drawImage(scoreShowIMG, x1, y1, 150, 50, this);
+		g1.drawString("生命值：", x1 + 10, y1 + 20);
+		for (int i = blood1 / 10; i > 0; i--) {
+			g1.drawImage(bloodShowIMG, x1 + 40 + 15 * i, y1 + 12, 13, 13, this);
+		}
+		g1.drawString("当前得分：" + String.valueOf(score1), x1 + 10, y1 + 40);
+	}
+
+	
 	/**
 	 * @param args
 	 */
